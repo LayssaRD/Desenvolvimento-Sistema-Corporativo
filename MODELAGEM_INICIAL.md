@@ -84,7 +84,7 @@ A conversa conseguiu contornar as principais inconsistências da proposta inicia
 
 Foi utilizado a inteligência artificial principalmente como analista crítico, todos os dados gerados por ela foram validados pelos integrantes da equipe.
 
-Modelo utilizado: Google Gemini Pro 3.1
-Forma de utilização: Analista crítico
-Principais contribuições: Identificar buracos na lógica de bloqueio de horários
-Algumas hipóteses reveladas, questões novas que surgiram e decisões revistas foi a remoção do módulo de pagamentos e bloqueamento dos agendamentos.
+* Modelo utilizado: Google Gemini Pro 3.1
+* Forma de utilização: Analista crítico
+* Principais contribuições: Identificar buracos na lógica de bloqueio de horários
+* Algumas hipóteses reveladas, questões novas que surgiram e decisões revistas foi a remoção do módulo de pagamentos e bloqueamento dos agendamentos.
