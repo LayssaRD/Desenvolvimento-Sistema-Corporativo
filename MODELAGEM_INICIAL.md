@@ -79,3 +79,12 @@ A conversa conseguiu contornar as principais inconsistências da proposta inicia
 * **Definir parâmetros de tempo:** Estabeleçam exatamente qual será o tempo limite para o prestador aprovar a solicitação, garantindo que ele não entre em conflito com a regra de antecedência de 12 horas.
 * **Mapear a máquina de estados do Agendamento:** Revisem o ciclo de vida do agendamento, garantindo que os estados "Pendente" e "Bloqueado Temporariamente" estejam formalizados nas regras de domínio.
 * **Modelar o sistema de reputação:** Documentem como as notas serão calculadas e se haverá consequências automáticas para clientes que faltarem seguidas vezes, já que essa é a única proteção do sistema contra fraudes na agenda.
+
+## DISCLAIMER: Uso de Inteligência Artificial
+
+Foi utilizado a inteligência artificial principalmente como analista crítico, todos os dados gerados por ela foram validados pelos integrantes da equipe.
+
+Modelo utilizado: Google Gemini Pro 3.1
+Forma de utilização: Analista crítico
+Principais contribuições: Identificar buracos na lógica de bloqueio de horários
+Algumas hipóteses reveladas, questões novas que surgiram e decisões revistas foi a remoção do módulo de pagamentos e bloqueamento dos agendamentos.
