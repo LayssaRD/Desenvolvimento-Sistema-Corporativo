@@ -73,16 +73,13 @@ flowchart TB
 
     Sistema[Sistema de Agendamento de Serviços]
 
-    Pagamento[[Gateway de Pagamento]]
     Notificacao[[Serviço de Notificação\nE-mail/SMS/Push]]
 
     Cliente -->|Busca e agenda serviços| Sistema
     Prestador -->|Cadastra serviços e gerencia agenda| Sistema
     Admin -->|Modera e audita a plataforma| Sistema
 
-    Sistema -->|Processa pagamentos| Pagamento
     Sistema -->|Envia confirmações e lembretes| Notificacao
-    Pagamento -->|Confirma transação| Sistema
 ```
 
 - ### Diagrama Arquitetural
@@ -159,7 +156,6 @@ flowchart LR
     Busca["Módulo de Busca<br/><br/>Categoria, localização<br/>e disponibilidade"]
     Disponibilidade["Módulo de Disponibilidade<br/><br/>Horários de trabalho<br/>Horários disponíveis"]
     Agendamentos["Módulo de Agendamentos<br/><br/>Criar, alterar, cancelar<br/>e consultar agendamentos"]
-    Pagamentos["Módulo de Pagamentos<br/><br/>Sinal e pagamentos<br/>Gateway externo"]
     Avaliacao["Módulo de Avaliação<br/><br/>Avaliação do serviço<br/>após a conclusão"]
     Historico["Módulo de Histórico<br/><br/>Agendamentos passados<br/>de clientes e prestadores"]
     Notificacoes["Módulo de Notificações<br/><br/>Confirmações, lembretes<br/>e cancelamentos"]
@@ -171,7 +167,6 @@ flowchart LR
     Agendamentos -->|"Consulta"| Usuarios
     Agendamentos -->|"Consulta"| Servicos
     Agendamentos -->|"Verifica"| Disponibilidade
-    Agendamentos -->|"Quando necessário"| Pagamentos
     Agendamentos -->|"Solicita"| Notificacoes
     Agendamentos -->|"Registra"| Historico
     Avaliacao -->|"Consulta"| Historico
@@ -181,7 +176,6 @@ flowchart LR
     Servicos -->|"Persiste"| Persistencia
     Disponibilidade -->|"Persiste"| Persistencia
     Agendamentos -->|"Persiste"| Persistencia
-    Pagamentos -->|"Persiste"| Persistencia
     Avaliacao -->|"Persiste"| Persistencia
     Historico -->|"Persiste"| Persistencia
     Administracao -->|"Consulta"| Persistencia
