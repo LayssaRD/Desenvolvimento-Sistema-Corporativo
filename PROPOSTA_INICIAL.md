@@ -106,9 +106,6 @@ flowchart TB
 ```
 
 - ### Diagrama de Fluxo do Sistema (REALIZAR AGENDAMENTO)
-
-> **Observação:** o fluxo abaixo representa um agendamento sem necessidade de pagamento antecipado. Quando houver sinal/pagamento, o módulo de Pagamentos será acionado antes da confirmação definitiva do agendamento.
-
 ```mermaid
 flowchart TD
     Inicio(["Cliente solicita um agendamento"])
