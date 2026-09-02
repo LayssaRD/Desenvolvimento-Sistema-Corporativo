@@ -18,7 +18,7 @@
 
 #### Qual problema o sistema resolve? Qual o contexto de uso? Quais necessidades motivam a criação da plataforma?
 
-Um Sistema de Agendamento de Serviços é necessário para controlar a agenda de um prestador de serviços de maneira facilitada e centralizada. Ele é utilizado para cadastrar o tipo de serviço que o prestador oferece, os horários disponíveis e seus valores; com isso, o cliente que deseja agendar um serviço visualiza essas informações e realiza o agendamento. Em alguns casos, também é possível realizar uma parte do pagamento (sinal) para que o agendamento seja efetivado, além de notificar o prestador sobre a nova reserva.
+Um Sistema de Agendamento de Serviços é necessário para controlar a agenda de um prestador de serviços de maneira facilitada e centralizada. Ele é utilizado para cadastrar o tipo de serviço que o prestador oferece, os horários disponíveis e seus valores; com isso, o cliente que deseja agendar um serviço visualiza essas informações e realiza o agendamento. Sempre irá notificar o prestador sobre uma nova reserva.
 
 O contexto de uso é o dia a dia de pequenos e médios negócios de prestação de serviços — salões de beleza, clínicas e oficinas mecânicas — que hoje dependem de agendas manuais, cadernos ou aplicativos de mensagem para controlar horários, o que gera conflitos, esquecimentos e falta de histórico organizado.
 
@@ -28,10 +28,9 @@ A plataforma se justifica pela necessidade de centralizar essas informações, e
 
 | Ator | Papel | Como interage com o sistema |
 |---|---|---|
-| **Cliente** | Usuário que busca e reserva serviços | Consulta serviços e horários, realiza agendamentos, efetua pagamento/sinal, avalia o serviço prestado |
+| **Cliente** | Usuário que busca e reserva serviços | Consulta serviços e horários, realiza agendamentos, avalia o serviço prestado |
 | **Prestador de Serviço** | Profissional ou estabelecimento que oferece o serviço | Cadastra serviços, define horários disponíveis e valores, gerencia sua agenda, confirma ou cancela agendamentos |
 | **Administrador** | Responsável pela gestão da plataforma | Gerencia prestadores cadastrados, realiza moderação e consulta relatórios internos |
-| **Sistema de Pagamento (externo)** | Serviço externo integrado | Processa pagamentos e sinais, retorna confirmação de transação |
 | **Sistema de Notificação (externo)** | Serviço externo integrado | Envia e-mails/SMS/push de confirmação, lembrete e cancelamento |
 
 ### Módulos do Sistema
@@ -42,13 +41,12 @@ A plataforma se justifica pela necessidade de centralizar essas informações, e
 | **Catálogo de Serviços** | Cadastro dos serviços oferecidos por cada prestador (tipo, duração, preço) |
 | **Busca** | Permite ao cliente localizar prestadores/serviços por categoria, localização e disponibilidade |
 | **Agendamento** | Núcleo do sistema; controla criação, alteração e cancelamento de reservas, validando conflitos de horário |
-| **Pagamentos** | Processa sinal/pagamento do agendamento, integrando-se a um gateway externo |
 | **Avaliação** | Permite ao cliente avaliar o serviço prestado após a conclusão |
 | **Histórico** | Mantém o registro de agendamentos passados de clientes e prestadores |
 | **Notificações** | Dispara confirmações, lembretes e avisos de cancelamento |
 | **Administração** | Gestão de prestadores cadastrados, moderação e relatórios internos |
 
-A divisão foi pensada para isolar a regra mais sensível do domínio (o Agendamento) dos módulos de apoio (Pagamentos, Notificações, Avaliação), que podem evoluir ou ser substituídos sem impactar a lógica central de reservas.
+A divisão foi pensada para isolar a regra mais sensível do domínio (o Agendamento) dos módulos de apoio (Notificações, Avaliação), que podem evoluir ou ser substituídos sem impactar a lógica central de reservas.
 
 
 ### Arquitetura em Camadas
@@ -188,19 +186,19 @@ Essa escolha se justifica porque:
 - **Atributos de qualidade:** consistência é mais crítica do que escalabilidade extrema nesta fase — um monólito facilita transações consistentes ao validar e confirmar um agendamento;
 - **Equipe:** equipe pequena (3 integrantes), o que tornaria o overhead operacional de microsserviços (deploy, comunicação entre serviços, observabilidade distribuída) desproporcional ao benefício;
 - **Complexidade operacional:** um monólito modular é mais simples de manter, testar e implantar nesta fase;
-- **Possibilidade de evolução:** como os módulos já são bem delimitados (Agendamento, Pagamentos, Notificações, etc.), a arquitetura permite, no futuro, extrair módulos específicos (por exemplo, Pagamentos ou Notificações) para serviços independentes, caso a demanda justifique.
+- **Possibilidade de evolução:** como os módulos já são bem delimitados (Agendamento, Notificações, etc.), a arquitetura permite, no futuro, extrair módulos específicos (por exemplo, Notificações) para serviços independentes, caso a demanda justifique.
 
 #### Módulo de maior complexidade
-O módulo de **Agendamento** é o que apresenta maior complexidade e sensibilidade arquitetural. Isso ocorre porque ele concentra as principais regras de negócio (impedir sobreposição de horários para um mesmo prestador, validar disponibilidade, tratar cancelamentos) e depende de múltiplos outros módulos para ser concluído (Catálogo de Serviços, Pagamentos e Notificações). Além disso, é o módulo mais suscetível a problemas de concorrência, já que dois clientes podem tentar reservar o mesmo horário simultaneamente.
+O módulo de **Agendamento** é o que apresenta maior complexidade e sensibilidade arquitetural. Isso ocorre porque ele concentra as principais regras de negócio (impedir sobreposição de horários para um mesmo prestador, validar disponibilidade, tratar cancelamentos) e depende de múltiplos outros módulos para ser concluído (Catálogo de Serviços e Notificações). Além disso, é o módulo mais suscetível a problemas de concorrência, já que dois clientes podem tentar reservar o mesmo horário simultaneamente.
 
 #### Desafios técnicos e arquiteturais
 1. **Consistência/Concorrência:** garantir que dois clientes não consigam reservar o mesmo horário com o mesmo prestador ao mesmo tempo (condição de corrida no momento da confirmação do agendamento).
-2. **Integração:** depender de um gateway de pagamento externo para confirmar o sinal do agendamento, lidando com falhas, timeouts ou indisponibilidade desse serviço.
+2. **Integração:** depender de um gateway externo para confirmar o sinal do agendamento, lidando com falhas, timeouts ou indisponibilidade desse serviço.
 3. **Disponibilidade:** manter a consulta de horários disponíveis sempre atualizada e responsiva, mesmo em horários de pico de acesso (ex.: início do dia, quando vários clientes consultam agendas ao mesmo tempo).
 4. **Escalabilidade:** suportar o crescimento do número de prestadores e clientes sem degradar o tempo de resposta da busca e do agendamento.
 
 #### Resposta arquitetural aos desafios
-A separação em camadas ajuda a isolar a regra de conflito de horário na camada de Domínio, tornando-a testável e independente da tecnologia de apresentação ou persistência escolhida. A validação de disponibilidade sempre passa pela camada de Domínio antes da persistência, reduzindo o risco de inconsistência. Além dessa validação, o banco de dados deverá utilizar transações e restrições de integridade para impedir que dois agendamentos para o mesmo prestador e horário sejam confirmados simultaneamente. A integração com pagamento e notificação foi isolada em módulos próprios, de forma que uma falha nesses serviços externos não comprometa diretamente o núcleo do domínio (pode-se, por exemplo, registrar o agendamento como "pendente de pagamento" caso o gateway esteja indisponível).
+A separação em camadas ajuda a isolar a regra de conflito de horário na camada de Domínio, tornando-a testável e independente da tecnologia de apresentação ou persistência escolhida. A validação de disponibilidade sempre passa pela camada de Domínio antes da persistência, reduzindo o risco de inconsistência. Além dessa validação, o banco de dados deverá utilizar transações e restrições de integridade para impedir que dois agendamentos para o mesmo prestador e horário sejam confirmados simultaneamente. A integração com a notificação foi isolada em módulos próprios, de forma que uma falha nesses serviços externos não comprometa diretamente o núcleo do domínio (pode-se, por exemplo, registrar o agendamento como "pendente" caso o gateway esteja indisponível).
 
 Ainda assim, algumas limitações permanecem: o controle de concorrência em alta escala exigiria mecanismos adicionais (como bloqueio otimista ou filas de processamento) que não são resolvidos apenas pela organização em camadas; e a arquitetura monolítica, embora adequada agora, exigirá revisão caso o volume de acessos cresça significativamente.
 
@@ -214,7 +212,7 @@ O sistema de agendamento precisa gerenciar clientes, profissionais, serviços, h
 ### Decisão
 **Qual escolha arquitetural foi realizada?**
 
-Será utilizada uma **arquitetura monolítica modular organizada em camadas**, separando responsabilidades de apresentação, aplicação, domínio e persistência. Os módulos, como usuários, serviços, agendamentos, pagamentos e notificações, permanecerão na mesma aplicação, mas com responsabilidades bem definidas. A API REST e o banco de dados relacional serão escolhas complementares de implementação.
+Será utilizada uma **arquitetura monolítica modular organizada em camadas**, separando responsabilidades de apresentação, aplicação, domínio e persistência. Os módulos, como usuários, serviços, agendamentos, notificações, permanecerão na mesma aplicação, mas com responsabilidades bem definidas. A API REST e o banco de dados relacional serão escolhas complementares de implementação.
 
 ### Alternativas consideradas
 **Quais outras possibilidades foram avaliadas?**
