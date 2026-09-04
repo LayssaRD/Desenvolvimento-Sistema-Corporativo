@@ -11,21 +11,22 @@ Pequenos e médios prestadores de serviços e seus clientes enfrentam problemas 
   * Esquecimentos, desorganização operacional e falta de histórico das interações.
   * Prejuízos financeiros e operacionais para os profissionais devido a ausências sem aviso prévio (no-shows) e falta de garantias de compromisso.
   * Dificuldade e atritos para os clientes localizarem profissionais, verificarem disponibilidades reais e realizarem marcações.
+  * Ausência de histórico ou reputação compartilhada entre prestadores: cada estabelecimento mantém (ou não mantém) seu próprio controle isoladamente, de modo que nenhum profissional sabe se um cliente novo tem histórico de faltas em outro salão, clínica ou oficina.
 
 * **Contexto:**
-O problema ocorre no ecossistema de atendimento de prestadores de serviços de pequeno e médio porte — abrangendo múltiplos domínios como salões de beleza, clínicas e oficinas mecânicas. Nesses ambientes, a marcação de horários costuma ocorrer de forma manual ou descentralizada. No caso específico das oficinas mecânicas, o contexto restringe-se exclusivamente à etapa de agendamento de revisões e diagnósticos (cujos tempos são definidos por blocos cadastrados), enquanto os serviços de conserto e execução de manutenção ocorrem de maneira independente da plataforma.
+O problema ocorre no ecossistema de atendimento de prestadores de serviços de pequeno e médio porte — abrangendo múltiplos domínios como salões de beleza, clínicas e oficinas mecânicas. Nesses ambientes, a marcação de horários costuma ocorrer de forma manual ou descentralizada, majoritariamente por WhatsApp e por instrumentos como caderno ou Google Agenda, sem uso de um sistema dedicado de gestão. No caso específico das oficinas mecânicas, o contexto restringe-se exclusivamente à etapa de agendamento de revisões e diagnósticos (cujos tempos são definidos por blocos cadastrados), enquanto os serviços de conserto e execução de manutenção ocorrem de maneira independente da plataforma.
 
 ## ETAPA 2 — Quadro de conhecimento atual
 
 | ID | Tipo | Descrição | Evidência / Como validar / Justificativa | Estado |
 | :--- | :--- | :--- | :--- | :--- |
-| F01 | FATO | Agendas manuais geram conflitos, esquecimentos e falta de histórico. | Constatado na análise inicial do problema e validado no contexto de pequenos e médios prestadores de serviços. | Confirmado |
-| F02 | FATO | O tempo e o valor de uma manutenção veicular (após diagnóstico) são variáveis e não padronizáveis em um catálogo simples. | Evidência: Afirmação do usuário durante a conversa. | Confirmado |
-| F03 | FATO | A plataforma opera sem processamento de pagamentos ou cobranças financeiras em sua versão inicial. | Constatado pela decisão de escopo do MVP focada apenas em agendamento e reputação. | Confirmado |
-| F04 | FATO | O fluxo de agendamento exige a aprovação manual prévia por parte do prestador de serviços. | Constatado nas premissas de autonomia e segurança da agenda. | Confirmado |
-| F05 | FATO | A avaliação mútua entre cliente e prestador é obrigatória após a conclusão do atendimento. | Constatado nas regras de segurança sistêmica adotadas para substituir o módulo financeiro. | Confirmado |
+| F01 | FATO | Agendas manuais geram conflitos, esquecimentos e falta de histórico. | Observação direta da equipe sobre a rotina de prestadores conhecidos. | Confirmado |
+| F02 | FATO | O tempo e o valor de uma manutenção veicular (após diagnóstico) são variáveis e não padronizáveis em um catálogo simples. | Afirmação do usuário durante a conversa (conhecimento de domínio). | Confirmado |
+| F03 | FATO | A maioria dos agendamentos hoje é feita por WhatsApp e por agendas manuais (caderno, Google Agenda, etc.), sem uso de sistema dedicado. | Observação direta da equipe sobre prestadores conhecidos. | Confirmado |
+| F04 | FATO | A maioria dos profissionais observados cobra uma parte do valor do serviço antecipadamente para garantir o agendamento. | Observação direta da equipe sobre prestadores conhecidos. | Confirmado |
+| F05 | FATO | O histórico do cliente (atendimentos, faltas, avaliações) não é centralizado nem consultável entre prestadores diferentes — cada salão/clínica/oficina mantém (ou não mantém) seu próprio controle isoladamente. | Observação direta da equipe sobre a rotina de prestadores conhecidos. | Confirmado |
 | H01 | HIPÓTESE | O sistema de avaliações mútuas e o limite numérico de agendamentos inibirão reservas falsas e faltas, mesmo sem cobrança financeira. | *Por que é hipótese:* O comportamento humano pode não ser totalmente contido apenas por reputação, especialmente em contas recém-criadas.<br>*Como validar:* Monitorar a taxa de no-show (não comparecimento) e de perfis falsos durante os primeiros meses de operação do sistema. | Aberta |
-| H02 | HIPÓTESE | Os prestadores terão o hábito e a disponibilidade de aprovar ou recusar solicitações manualmente em tempo hábil. | *Por que é hipótese:* Em oficinas ou salões movimentados, o profissional pode não olhar o aplicativo com frequência.<br>*Como validar:* Acompanhar o tempo médio de resposta dos prestadores e a taxa de agendamentos expirados automaticamente. | Aberta |
+| H02 | HIPÓTESE | Os prestadores terão o hábito e a disponibilidade de aprovar ou recusar solicitações manualmente em tempo hábil. | *Por que é hipótese:* Em oficinas ou salões movimentados, o profissional pode não olhar o aplicativo com frequência — reforçado pelo fato F03, que mostra que o hábito atual é WhatsApp/caderno, não um app dedicado.<br>*Como validar:* Acompanhar o tempo médio de resposta dos prestadores e a taxa de agendamentos expirados automaticamente. | Aberta |
 | H03 | HIPÓTESE | A exigência de antecedência mínima de 12 horas reduzirá cancelamentos em cima da hora por parte dos clientes. | *Por que é hipótese:* Clientes ainda podem tentar desmarcar de última hora por imprevistos pessoais.<br>*Como validar:* Analisar o volume de cancelamentos ocorridos fora da janela permitida. | Aberta |
 | H04 | HIPÓTESE | O bloqueio sistêmico (Hard Block) por falta de avaliação forçará o preenchimento dos dados sem afastar os usuários da plataforma. | *Por que é hipótese:* Usuários podem se irritar com o bloqueio e abandonar o aplicativo em vez de avaliar.<br>*Como validar:* Medir a taxa de retenção e o tempo médio que os usuários demoram para destravar a conta após uma pendência. | Aberta |
 | H05 | HIPÓTESE | A restrição de oficinas mecânicas estritamente a diagnósticos e revisões simplificará a adoção da ferramenta sem gerar atritos operacionais. | *Por que é hipótese:* Oficinas podem esperar que a plataforma faça a gestão completa do tempo de reparo físico.<br>*Como validar:* Coletar feedback qualitativo dos mecânicos durante o uso piloto. | Aberta |
@@ -33,9 +34,10 @@ O problema ocorre no ecossistema de atendimento de prestadores de serviços de p
 | Q02 | QUESTÃO EM ABERTO | Como será calculado o limite de agendamentos por cliente (ex.: limite diário, semanal, ou apenas solicitações pendentes simultâneas)? | *Quem pode responder:* Equipe de negócios/Produto. | Aberta |
 | Q03 | QUESTÃO EM ABERTO | Como os clientes e prestadores novos (sem histórico de avaliação) serão tratados na plataforma? | *Quem pode responder:* Equipe de negócios/Produto. | Aberta |
 | D01 | DECISÃO | O sistema agendará apenas diagnósticos/revisões para oficinas mecânicas. | *Justificativa:* Isola a plataforma da complexidade de rastrear tempos e valores variáveis da execução do serviço corretivo. | Atual |
-| D02 | DECISÃO | A plataforma não processará pagamentos. | *Justificativa:* Atuará apenas como catálogo e organizador de agenda, reduzindo drasticamente a complexidade técnica e a responsabilidade legal do MVP. | Atual |
+| D02 | DECISÃO | A plataforma não processará pagamentos. | *Justificativa:* Reduz a complexidade técnica e a responsabilidade legal do MVP. O fato F04 sugere que a cobrança de sinal já é uma prática informal do mercado, resolvida fora da plataforma (Pix, dinheiro, combinação direta) — o que reduz o risco de manter esse fluxo fora do escopo por enquanto. | Atual |
 | D03 | DECISÃO | O fluxo de agendamento exigirá aprovação manual do prestador. | *Justificativa:* Permite que o profissional avalie a reputação do cliente antes de confirmar, mitigando riscos de cancelamento e trotes. | Atual |
 | D04 | DECISÃO | O horário ficará bloqueado durante a pendência de aprovação e será exigida antecedência mínima de 12 horas. | *Justificativa:* Impede concorrência direta pelo mesmo horário e garante tempo hábil para o prestador se organizar e responder. | Atual |
+| D05 | DECISÃO | A avaliação mútua entre cliente e prestador será obrigatória após a conclusão do atendimento. | *Justificativa:* Atua como substituto comportamental para a ausência de garantia financeira (D02), servindo como principal barreira contra reservas falsas e faltas recorrentes. | Atual |
 
 ## ETAPA 3 — Escolha do fluxo principal
 
@@ -181,7 +183,7 @@ A partir dos fluxos e operações analisados, o sistema precisa conhecer, proces
   * *Por que precisa existir:* O negócio precisa preservar essa informação temporal para calcular matematicamente a regra de antecedência mínima de 12 horas e governar o mecanismo de expiração automática (*timeout*) das solicitações que aguardam a resposta do prestador.
 
 * **Histórico de Avaliações e Reputação:** Notas, comentários agregados e o status de preenchimento das avaliações vinculadas a clientes e prestadores.
-  * *Por que precisa existir:* O negócio precisa preservar esse histórico para alimentar o sistema de reputação (que atua como barreira de segurança na ausência de pagamentos), embasar a decisão manual de aprovação do prestador e aplicar o bloqueio sistêmico (*Hard Block*) a usuários inadimplentes em avaliações ou reincidentes em faltas (*no-shows*).
+  * *Por que precisa existir:* Hoje, essa informação simplesmente não existe de forma compartilhada — cada prestador reconstrói sua própria percepção do cliente do zero a cada novo agendamento, já que o histórico não é centralizado nem consultável entre estabelecimentos diferentes. O negócio precisa preservar esse histórico para alimentar o sistema de reputação (que atua como barreira de segurança na ausência de pagamentos), embasar a decisão manual de aprovação do prestador e aplicar o bloqueio sistêmico (*Hard Block*) a usuários inadimplentes em avaliações ou reincidentes em faltas (*no-shows*).
 
 ## ETAPA 10 — O que ainda não sabemos?
 
@@ -212,26 +214,37 @@ Ao retornar ao quadro inicial e aos limites do conhecimento atual da equipe apó
 * **7. Que decisões técnicas ainda não possuem evidência suficiente para serem tomadas?**
   * A definição da arquitetura de software definitiva (ex.: escolha entre um monólito modular ou microsserviços) e a tecnologia exata de mensageria assíncrona para gerenciar os disparos de expiração por *timeout*. Como o escopo de negócio ainda está em fase de validação conceitual, detalhar a infraestrutura técnica agora seria prematuro.
 
-## J. Contradições ou fragilidades
-* **Fragilidade na regra de antecedência:** Se o agendamento exige 12 horas de antecedência, o tempo limite de expiração (timeout) precisa ser matematicamente inferior a isso, caso contrário, uma reserva pode expirar quando o horário já passou.
-* **Decisões descartadas:** O documento inicial previa um módulo de Pagamento para processar sinais. Essa premissa foi tratada como fato na proposta, mas foi descartada na conversa para viabilizar o MVP.
-* **Decisões técnicas antecipadas:** A proposta inicial fixou uma arquitetura monolítica modular e divisão estrita em quatro camadas. Embora defensável, a equipe não deve engessar essas decisões antes de mapear completamente os novos estados do agendamento (pendência, expiração automática).
+## ETAPA 11 — Reflexão da equipe
 
-## L. Avaliação da maturidade da análise
-**RAZOAVELMENTE FUNDAMENTADA**
+**O que a equipe compreendeu sobre o sistema que não estava claro inicialmente / O que este trabalho mudou na forma como a equipe pensa sobre o sistema:**
 
-A conversa conseguiu contornar as principais inconsistências da proposta inicial. A exclusão dos pagamentos e a limitação do escopo das oficinas (apenas revisões/diagnósticos) removeram obstáculos críticos. O fluxo central com aprovação manual e reserva temporária de horários é sólido. Contudo, ainda não se pode avançar para a modelagem definitiva sem antes parametrizar as regras de timeout e de reputação.
+Inicialmente, a ideia era focar em um único tipo de serviço. Ao longo da análise, percebemos que há uma escassez geral de aplicativos de agendamento para esse mercado de pequenos prestadores, que vem crescendo gradativamente. Isso nos levou a ampliar o escopo do sistema para atender diversos segmentos — salões de beleza (cortes, coloração, manicure, sobrancelha, cílios), clínicas de estética (massagens, micropigmentação labial) e oficinas mecânicas/estética automotiva — em vez de nos limitarmos a uma única área.
 
-## M. Recomendações para a equipe
-* **Definir parâmetros de tempo:** Estabeleçam exatamente qual será o tempo limite para o prestador aprovar a solicitação, garantindo que ele não entre em conflito com a regra de antecedência de 12 horas.
-* **Mapear a máquina de estados do Agendamento:** Revisem o ciclo de vida do agendamento, garantindo que os estados "Pendente" e "Bloqueado Temporariamente" estejam formalizados nas regras de domínio.
-* **Modelar o sistema de reputação:** Documentem como as notas serão calculadas e se haverá consequências automáticas para clientes que faltarem seguidas vezes, já que essa é a única proteção do sistema contra fraudes na agenda.
+**Qual hipótese apresentou maior risco para o projeto:**
+
+O maior risco identificado está relacionado a H02 — a hipótese de que os prestadores terão o hábito e a disponibilidade de aprovar ou recusar solicitações manualmente em tempo hábil. Se o prestador não confirmar as reservas dentro do prazo, isso pode gerar um histórico de recusas/expirações que prejudica sua reputação na plataforma sem que isso reflita, de fato, um problema com o cliente. Seria necessário pensar em alguma forma de lembrar o prestador de acessar o app e realizar os aceites no prazo estabelecido.
+
+**Qual questão ainda precisa ser investigada com maior prioridade:**
+
+A questão prioritária é a Q01 — qual é o tempo exato de tolerância (timeout) até que uma solicitação pendente seja considerada recusada automaticamente. Esse prazo precisa equilibrar duas necessidades: dar tempo hábil para o prestador visualizar e responder à solicitação, e ao mesmo tempo garantir um retorno breve para o cliente que está aguardando a confirmação do agendamento.
+
+**Houve alguma ideia inicial que precisou ser revista:**
+
+Sim. A ideia inicial era restringir o sistema a um único tipo de serviço; ela foi revisada para um escopo mais amplo, abrangendo múltiplos segmentos de pequenos prestadores.
+
+**Qual parte do fluxo/decisão exigiu mais discussão:**
+
+O tratamento das oficinas mecânicas foi o ponto que mais demandou tempo de decisão, por causa da ausência de valor tabelado para o serviço de manutenção — decidimos restringir o agendamento, nesse caso, apenas a revisão/diagnóstico.
+
+**A equipe se considera preparada para avançar para a Modelagem de Domínio? Por quê:**
+
+A equipe considera que o entendimento do problema, do fluxo principal e das operações está suficientemente maduro para avançar. No entanto, conforme já reconhecido na Etapa 10, algumas definições ainda precisam ser parametrizadas antes da modelagem definitiva — principalmente o tempo exato de timeout para aprovação (Q01) e sua relação matemática com a antecedência mínima de 12 horas, além dos detalhes da máquina de estados do agendamento e das regras de cálculo do sistema de reputação. Portanto, a equipe se considera preparada para iniciar a Modelagem de Domínio, mas com esses pontos como prioridade a serem resolvidos em paralelo ou no início dessa próxima etapa.
 
 ## DISCLAIMER: Uso de Inteligência Artificial
 
 Foi utilizado a inteligência artificial principalmente como analista crítico, todos os dados gerados por ela foram validados pelos integrantes da equipe.
 
-* Modelo utilizado: Google Gemini Pro 3.1
-* Forma de utilização: Analista crítico
-* Principais contribuições: Identificar buracos na lógica de bloqueio de horários
+* **Modelo utilizado:** Google Gemini Pro 3.1
+* **Forma de utilização:** Analista crítico
+* **Principais contribuições:** Identificar buracos na lógica de bloqueio de horários
 * Algumas hipóteses reveladas, questões novas que surgiram e decisões revistas foi a remoção do módulo de pagamentos e bloqueamento dos agendamentos.
