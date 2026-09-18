@@ -1,4 +1,3 @@
-
 ## 01. Apresentação e retomada do sistema
 
 *   **Nome do sistema:** Sistema de Agendamento de Serviços (Salão, Clínica, Oficina).
@@ -8,7 +7,7 @@
 *   **Objetivo da solução:** Atuar como um marketplace genérico e catálogo centralizado, garantindo a segurança das reservas por meio de um fluxo de aprovação com *timeout* matemático e um sistema comportamental de avaliações mútuas baseadas em qualidade.
 *   **Fluxo principal analisado:** O Usuário (como Cliente) solicita a reserva com antecedência obrigatória mínima de 24 horas. O Usuário (como Prestador) possui um prazo limite de até 10 horas antes do evento para confirmar ou recusar o pedido. Se o cliente precisar, pode cancelar a reserva. Após o evento, o fluxo é encerrado com a avaliação bidimensional obrigatória (qualidade do serviço e do atendimento).
 *   **Principais operações:** Buscar catálogo, Validar elegibilidade de agendamento (limites e antecedência), Criar solicitação, Cancelar reserva, Processar decisão do prestador, Expirar solicitação (*timeout*) e Registrar avaliação bidimensional.
-*   **Principais informações:** O sistema precisa preservar o histórico unificado de reputação (para o *Hard Block*), o ciclo de vida da reserva (máquina de estados) e as janelas de tempo de disponibilidade.
+*   **Principais informações:** O sistema precisa preservar o histórico unificado de reputação dos Usuários, o ciclo de vida da reserva (máquina de estados) e as janelas de tempo de disponibilidade.
 
 ## 02. Rastreabilidade do conhecimento anterior
 
@@ -36,6 +35,7 @@ A partir dos fluxos e regras revisitadas, identificamos os seguintes candidatos 
 | **Janela de Tempo** | Regras de bloqueio de concorrência. | O sistema precisa de uma coordenada matemática para evitar sobreposição de horários. | Certeza |
 | **Status do Agendamento** | Controle de ciclo de vida. | Necessário para ditar as regras de negócio de acordo com a fase atual da reserva. | Certeza |
 | **Timeout (10h/24h)** | Questão Q01 resolvida. | Regra temporal crítica que cancela solicitações pendentes órfãs para liberar a agenda. | Certeza |
+| **Catálogo** | Objetivo da solução ("marketplace genérico e catálogo centralizado") e Operação "Buscar catálogo". | Representa o mecanismo central de descoberta do marketplace, agregando os Serviços ofertados pelos Prestadores para busca pelos Clientes. | Hipótese |
 
 ## 04. Investigação de identidade
 
@@ -45,10 +45,11 @@ Antes de classificar os conceitos, é imperativo analisar se eles exigem identid
 | :--- | :--- | :--- | :--- |
 | **Usuário** | Sim | Os dados (telefone, endereço) podem mudar, mas o negócio precisa manter a reputação agregada vinculada à mesma pessoa física/jurídica continuamente. | Entidade |
 | **Agendamento** | Sim | Possui um ciclo de vida dinâmico. O negócio precisa consultar "aquela reserva específica" para mudá-la de Pendente para Confirmada, ou para Cancelá-la. | Entidade |
-| **Serviço** | Não | Importa apenas a composição de seus valores (Nome, Duração, Preço). Se um prestador oferece "Corte", a identidade lógica está no valor oferecido ao cliente. | Objeto de Valor |
+| **Serviço** | Não | Importa apenas a composição de seus valores (Nome, Duração, Preço). Se um prestador oferece "Corte", a identidade lógica está no valor oferecido ao cliente. | Entidade |
 | **Avaliação** | Não | Uma vez gerada, a avaliação é imutável. Importam apenas as notas (serviço e atendimento) e o comentário. Ela qualifica o usuário, não tem ciclo de vida próprio. | Objeto de Valor |
 | **Janela de Tempo** | Não | Uma data e hora de início/fim (ex: "Dia 20, 14h às 15h") não muda de identidade; é apenas uma coordenada estática de tempo. | Objeto de Valor |
 | **Status** | Não | Representa apenas uma classificação/estado temporário no qual o Agendamento se encontra. | Outro (Estado) |
+| **Catálogo** | Não | Não possui identidade própria; é uma visão agregada e dinâmica dos Serviços ativos ofertados pelos Prestadores no momento da busca. Não é referenciado posteriormente como "aquele catálogo específico". | Outro (Visão agregada) |
 
 ## 05. Entidades, Objetos de Valor e outros conceitos
 
@@ -63,6 +64,7 @@ Com base na investigação de identidade e no significado estrutural, os candida
 | **Janela de Tempo** | Provável Objeto de Valor | Representa a coordenada temporal. Dois agendamentos na mesma janela acionam a Invariante de conflito. | Necessidade de checagem matemática de datas/horas. | Alto |
 | **Status do Agendamento** | Outro (Estado) | Condição mutável que rege as transições válidas e o comportamento de bloqueio do Agendamento. | Fluxo do domínio. | Alto |
 | **Timeout (Regras)** | Outro (Política/Regra) | Representa a Política de Negócio de expiração. Não armazena dados, é uma regra executada no domínio. | Definição das Invariantes. | Alto |
+| **Catálogo** | Outro (Visão agregada / Mecanismo de busca) | Não carrega identidade nem é um valor imutável; é a superfície de consulta que expõe os Serviços cadastrados pelos Prestadores no domínio do marketplace. | Operação "Buscar catálogo" e objetivo de "marketplace genérico e catálogo centralizado" (Etapa 01). | Baixo |
 
 ## 06. Casos de classificação ambígua
 
@@ -92,6 +94,7 @@ As conexões semânticas que permitem ao domínio funcionar:
 | **Usuário (papel Prestador)** | *recebe / decide* | **Agendamento** | O prestador é o proprietário da agenda que sofre o bloqueio temporal e toma a decisão. | Etapa de decisão manual. |
 | **Usuário (papel Prestador)** | *oferta* | **Serviço** | O prestador expõe a promessa de valor que ditará o tempo bloqueado. | Catálogo de Serviços. |
 | **Agendamento** | *ocupa* | **Janela de Tempo** | A reserva precisa estar atrelada a uma coordenada matemática de início/fim para evitar sobreposições. | Regra de validação de conflito de agenda. |
+| **Agendamento** | *referencia* | **Serviço** | O agendamento formaliza qual promessa de valor específica (o serviço escolhido) será entregue ao cliente na janela reservada. | Etapa de escolha do serviço na solicitação; presente no Modelo Conceitual (Etapa 12). |
 | **Agendamento** | *origina* | **Avaliação** | O feedback está diretamente condicionado à ocorrência física do compromisso reservado. | Regra de reputação obrigatória. |
 
 ## 08. Cardinalidades
@@ -104,6 +107,7 @@ Quantificação estrutural baseada nas regras de negócio estabelecidas:
 | **Usuário (Prestador) ↔ Agendamento** | **1 : 0..N** | O prestador recebe múltiplas intenções de reserva ao longo do tempo. | Confirmada. |
 | **Usuário (Prestador) ↔ Serviço** | **1 : 1..N** | Para existir no catálogo, o prestador deve ofertar ao menos um serviço base. | Confirmada. |
 | **Agendamento ↔ Janela de Tempo** | **1 : 1** | Toda reserva necessita obrigatoriamente de exatamente um período de início e fim. | Confirmada. |
+| **Agendamento ↔ Serviço** | **1 : 1** | Cada reserva referencia exatamente um serviço do catálogo do prestador; não existe reserva "genérica" sem um serviço definido. | Confirmada. |
 | **Agendamento ↔ Avaliação** | **1 : 0..2** | Uma reserva gera no máximo 2 avaliações (uma do cliente, uma do prestador), ou 0 se for cancelada/expirada. | Confirmada. |
 
 ## 09. Regras de Negócio
@@ -174,28 +178,28 @@ classDiagram
     }
 
     class Servico {
-        <<Objeto Valor de>>
+        <<Objeto de Valor>>
         Nome
         DuracaoEstimada
         Preco
     }
 
     class JanelaDeTempo {
-        <<Objeto Valor de>>
+        <<Objeto de Valor>>
         Data
         HoraInicio
         HoraTermino
     }
 
     class Avaliacao {
-        <<Objeto Valor de>>
+        <<Objeto de Valor>>
         NotaServico
         NotaAtendimento
         Comentario
     }
     
     class PoliticaDeTimeout {
-        <<Regra Negocio de>>
+        <<Regra de Negócio>>
         CalculaExpiracao(10h)
     }
 
@@ -212,8 +216,9 @@ classDiagram
 
 *   **Por que cada conceito está presente:** O modelo garante a coesão do marketplace. O `Usuario` centraliza as punições e a identidade. O `Agendamento` é o orquestrador transacional. O `Servico` e a `JanelaDeTempo` fornecem as condições físicas da reserva. A `Avaliacao` é a governança garantidora da segurança do ecossistema.
 *   **Identidade vs. Objetos de Valor:** Apenas `Usuario` e `Agendamento` foram modelados como Entidades, pois são as únicas peças que sofrem transições no tempo (como os bloqueios e cancelamentos). `Servico`, `JanelaDeTempo` e `Avaliacao` foram encapsulados como Objetos de Valor pois importam estritamente pela integridade dos dados que carregam, sem ciclos de vida autônomos.
-*   **Relações mais importantes:** As duas setas partindo de `Usuario` para `Agendamento` sustentam a eliminação da dualidade Cliente/Prestador, demonstrando que uma única identidade atua nos dois pólos da transação assumindo papéis.
+*   **Relações mais importantes:** As duas setas partindo de `Usuario` para `Agendamento` sustentam a eliminação da dualidade Cliente/Prestador, demonstrando que uma única identidade atua nos dois pólos da transação assumindo papéis. A relação `Agendamento` → `Servico` (1:1), antes presente apenas no diagrama, foi formalizada nas tabelas de relações e cardinalidades (Etapas 07 e 08) para eliminar a inconsistência entre o modelo visual e o suporte textual.
 *   **Regras impactantes:** A `PoliticaDeTimeout` está representada de forma desacoplada monitorando o Agendamento, ilustrando fisicamente a Invariante das "10 horas antes" (RN02).
+*   **Elementos que ainda apresentam incerteza:** O `Catálogo` foi identificado como candidato a conceito (Etapa 03), mas com grau de certeza baixo: por ora entende-se que é apenas uma visão agregada dos Serviços ofertados, sem identidade nem ciclo de vida próprios, e por isso não foi incluído como classe no diagrama. Da mesma forma, o mecanismo de bloqueio comportamental por reputação ("Hard Block"), citado como necessidade do problema original, ainda não possui Regra de Negócio ou Invariante que o sustente, permanecendo registrado como Pendência de Governança (Etapa 16) até ser investigado com mais profundidade.
 
 ## 14. Evolução do modelo
 
@@ -221,10 +226,12 @@ Como o conhecimento se consolidou e refinou o modelo atual:
 
 | Momento | Alteração realizada | Motivo | Evidência ou descoberta que provocou a mudança |
 | :--- | :--- | :--- | :--- |
-| **Identificação Inicial** | Cliente e Prestador eram Entidades isoladas. | Redução de duplicidade e coesão de identidade. | Análise da matriz DSC: A pessoa física é a mesma, só o papel no agendamento muda. |
-| **Regras (Tempo)** | Questão de tempo em aberto definida para 24h e 10h. | Necessidade de Invariantes matemáticas testáveis. | O *timeout* precisava ser menor que a antecedência para evitar estados inválidos. |
-| **Regras (Limite)** | Criação da regra de "1 por dia". | Prevenir ataques e spam na agenda dos prestadores. | Necessidade de proteger o bloqueio temporário (Pendente) de usuários mal-intencionados. |
-| **Refinamento do VO** | Avaliação passou a ser bidimensional (Serviço + Atendimento). | Oferecer métricas mais justas ao prestador (o corte foi bom, mas o salão atrasou). | Nova requisição de negócio documentada. |
+| **Identificação inicial** | Cliente e Prestador eram Entidades isoladas. | Redução de duplicidade e coesão de identidade. | Análise da matriz DSC: a pessoa física é a mesma, só o papel no agendamento muda. |
+| **Investigação de identidade** | Definição de que apenas Usuário e Agendamento exigem identidade própria; Serviço, Avaliação e Janela de Tempo passam a ser tratados como Objetos de Valor. | Nenhum dos demais candidatos precisa ser rastreado individualmente ao longo do tempo pelo negócio. | Respostas às perguntas de identidade da Etapa 04. |
+| **Relações e Cardinalidades** | Formalização da relação Agendamento–Serviço (1:1) nas tabelas de relações e cardinalidades, que já existia apenas no diagrama. | Evitar divergência entre o modelo visual e o suporte textual que o justifica. | Revisão crítica identificando que toda reserva precisa referenciar um serviço específico. |
+| **Regras (Tempo e Limite)** | Definição da regra de tempo (24h/10h) e criação da regra de "1 por dia". | Necessidade de Invariantes matemáticas testáveis e prevenção de spam na agenda dos prestadores. | O *timeout* precisava ser menor que a antecedência; necessidade de proteger o bloqueio temporário (Pendente). |
+| **Refinamento de candidatos** | Inclusão do `Catálogo` como candidato a conceito (grau de certeza baixo) e remoção da menção prematura ao "Hard Block" como informação já decidida. | O `Catálogo` já era citado como objetivo central do marketplace, mas nunca havia sido investigado; o "Hard Block" ainda não possuía Regra de Negócio ou Invariante que o sustentasse. | Princípio de que nenhum elemento deve existir no modelo sem evidência e rastreabilidade. |
+| **Modelo atual** | Avaliação passou a ser bidimensional (Serviço + Atendimento) e o modelo foi consolidado com Usuário, Agendamento, Serviço, Janela de Tempo, Avaliação e Política de Timeout. | Oferecer métricas mais justas ao prestador e representar apenas o que está justificado pelo conhecimento acumulado. | Nova requisição de negócio documentada e análise crítica final da equipe. |
 
 ## 15. Revisões identificadas em relação aos documentos anteriores
 
@@ -243,20 +250,22 @@ Itens que não foram atualizados agora, mas que requerem alinhamento futuro:
 | :--- | :--- | :--- | :--- |
 | **Diagrama Arquitetural Inicial** | Reflete "Cliente" e "Prestador" como domínios isolados. | Alta | A equipe de desenvolvimento criará cadastros duplicados erroneamente. |
 | **Tabela de Atores** | O conceito de "Usuário com Papéis dinâmicos" precisa ser inserido na tabela. | Média | Confusão na gestão de acesso (*permissions*). |
+| **Mecanismo de bloqueio comportamental (Hard Block) por reputação** | Foi citado como necessidade do problema central (Etapa 01) e como decisão intuitiva (Etapa 17), mas nunca formalizado como Regra de Negócio ou Invariante nesta modelagem. | Média | O sistema pode registrar reputação sem nunca agir sobre ela, mantendo o problema original (no-shows sem consequência) sem solução real. |
+| **Conceito Catálogo** | Foi incluído nesta revisão apenas como candidato de baixa certeza, sem relações ou cardinalidades investigadas. | Baixa | O mecanismo de descoberta do marketplace pode ficar sem representação formal no domínio quando a modelagem avançar para contextos delimitados. |
 
 ## 17. Análise crítica do modelo
 
 Respondendo às provocações críticas sobre a estabilidade do domínio:
 
 1.  **Qual parte do modelo possui melhor sustentação?** O Ciclo de Vida do `Agendamento` e a `JanelaDeTempo`. Suas transições e invariantes são lógicas, matemáticas e essenciais para a prevenção de *overbooking*.
-2.  **Qual conceito possui classificação mais incerta?** O Serviço. Embora modelado como Objeto de Valor hoje, se no futuro o sistema decidir que Serviços precisam de "versões", "promoções sazonais" ou "histórico de preços", ele será forçado a virar uma Entidade.
+2.  **Qual conceito possui classificação mais incerta?** O `Catálogo`. Foi incorporado nesta revisão como candidato explicativo do mecanismo de busca do marketplace, mas ainda carece de investigação sobre suas relações e cardinalidades, podendo revelar-se apenas uma operação de consulta e não um conceito de domínio autônomo. O `Serviço` também mantém incerteza média, pois hoje é Objeto de Valor, mas poderia se tornar Entidade caso o negócio passe a exigir versões ou histórico de preços.
 3.  **Qual relação possui justificativa mais frágil?** Agendamento → Avaliação (1 : 0..2). Ela é frágil porque assume que o fluxo só "termina" moralmente com o feedback, mas sistemicamente é difícil garantir as duas notas.
 4.  **Qual cardinalidade ainda precisa de validação?** O limite antifraude (1 agendamento por dia para o cliente). Pode ser muito restritivo para clientes legítimos que desejam ir a um salão e depois a uma oficina no mesmo dia.
 5.  **Qual regra possui maior impacto?** As regras temporais RN01 e RN02 (24h/10h). Todo o processamento em lote (*cron job*) e sistema assíncrono dependerá dessa matemática de domínio.
-6.  **Decisão baseada em intuição?** O bloqueio comportamental sistêmico (*Hard block*). Intui-se que o usuário valoriza a plataforma o suficiente para avaliar; se a plataforma não tiver tração, ele simplesmente abandonará o app em vez de avaliar.
+6.  **Decisão baseada em intuição?** O bloqueio comportamental sistêmico (*Hard block*). Intui-se que o usuário valoriza a plataforma o suficiente para avaliar; se a plataforma não tiver tração, ele simplesmente abandonará o app em vez de avaliar. Esse mecanismo ainda não foi formalizado como Regra de Negócio ou Invariante nesta etapa, permanecendo registrado como Pendência de Governança (Etapa 16).
 7.  **Hipótese que provocaria maior mudança:** Se rejeitarem a ideia de que "Não processaremos pagamentos". A inclusão de transações financeiras mudaria os Status, exigiria Entidades de Faturamento, Estornos e Invariantes financeiras severas.
 8.  **Nova informação que mudaria o modelo:** Se as clínicas exigissem a separação do Agendamento por "Sala" e "Equipamento", não apenas por Prestador. A `JanelaDeTempo` precisaria envolver controle de recursos físicos.
-9.  **Parte a ser revisada futuramente:** A granularidade da `Avaliacao`.
+9.  **Parte a ser revisada futuramente:** A granularidade da `Avaliacao` e o aprofundamento do `Catálogo`.
 10. **Contradição existente?** A dualidade de Cliente e Prestador ainda existe nominalmente no repositório antigo, o que agora entra em contradição com o conceito unificado de Usuário proposto aqui.
 
 ## 18. Reflexão da equipe
